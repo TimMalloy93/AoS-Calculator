@@ -34,11 +34,11 @@ export default {
   grid-template-columns: 1fr; /* Single column layout by default */
   grid-template-areas:
     "home"
-    "calc"
     "l-aside"
+    "calc"
     "r-aside"
     "footer";
-  height: 100vh; /* Set the height to 100% of the viewport height */
+  height: auto; /* Set the height to 100% of the viewport height */
 }
 
 .home {
@@ -53,6 +53,11 @@ export default {
   width: 100%; /* Ensure images fill their container */
   height: auto; /* Maintain aspect ratio */
 }
+footer {
+    position: relative; /* Remove absolute positioning to avoid overlap */
+    grid-area: footer;
+  }
+  
 
 /* Media query for mobile devices */
 @media (max-width: 767px) {
@@ -105,12 +110,25 @@ export default {
       "l-aside calc r-aside"
       "footer footer footer";
   }
+  footer {
+    position: absolute; /* Ensure footer sticks to the bottom */
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
 }
 
 footer {
   grid-area: footer;
   text-align: center;
   padding: 10px;
-  background-color: #ccc;
+  border-top: solid;
+  border-color: black;
+  /* background-color: #ccc; */
+  width: 100%; /* Ensure the footer takes the full width */
+  height: 50px; /* Define a fixed height */
+  box-sizing: border-box; /* Ensure padding doesn't exceed the defined height */
 }
+
 </style>

@@ -162,6 +162,9 @@ export default {
     if (!this.validateInputs()){
         return;
     }
+    if (this.hitrate > this.critrate){
+        this.critrate = this.hitrate;
+    }
 
     let totalHits = this.attacks * ((7 - this.hitrate) / 6);
     let criticals = this.attacks * ((7 - this.critrate) / 6);
@@ -173,6 +176,7 @@ export default {
     let finalHits = totalHits;
     let dmg = 0;
 
+    
     
     if (this.hasRerolls) {
         let rerolledOnes = this.attacks * (1 / 6); // 1/6th of attacks are 1's
@@ -260,18 +264,6 @@ export default {
 </script>
 
 <style scoped>
-
-
-/* 
-#unitStats{
-    display: flex;
-    flex-flow: column;
-    border: 3px solid black;
-    padding: 5px;
-    margin: 5px;
-   background-color: goldenrod;
-       
-} */
 
 .hit,
 .hit#hitRate{

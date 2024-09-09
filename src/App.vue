@@ -51,11 +51,29 @@ footer {
   position: absolute;
   bottom: 0;
   width: 100%;
-  background-color: #f1f1f1;
   padding: 10px;
   text-align: center;
   box-sizing: border-box;
   height: 50px; /* Set an appropriate height */
 }
+@media (max-width: 767px) {
+  html, body, #app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: auto; 
+}
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+  box-sizing: border-box;
+  height: 50px; /* Set an appropriate height */
 
+  
+}
+
+}
 </style>
