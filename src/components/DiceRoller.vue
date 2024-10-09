@@ -1,6 +1,6 @@
 <template>
     <div id="container">
-        <h1 id="title">Damage Calculator</h1>
+        <h1 id="title">Dice Roller</h1>
     
         <form id="unitStats" v-on:submit.prevent="calculateDamage">
             <label for="attacks" class="attacks">Number of Attacks</label>
@@ -66,19 +66,19 @@
         <!-- Results Container -->
         <div id="results-container" v-if="results">
             <div id="results-hits">
-                <h3 id="total-hits">Total Hits: {{ results.totalHits }}</h3>
-                <h3 id="criticals">Critical Hits: {{ results.criticals }}</h3>
-                <h3 id="final-hits">Final Hits: {{ results.finalHits }}</h3>
+                <h3 id="total-hits">Total Hits: {{results.totalHits.length}} {{ results.totalHits }}</h3>
+                <h3 id="criticals">Critical Hits:{{ results.criticals.length }} {{ results.criticals }}</h3>
+                <!-- <h3 id="final-hits">Final Hits: {{ results.finalHits }}</h3> -->
             </div>
     
             <div id="results-wounds">
-                <h3 id="wounds">Total Wounds: {{ results.wounds }}</h3>
-                <h3 id="total-wounds">Final Wounds: {{ results.totalWounds }}</h3>
+                <h3 id="wounds">Total Wounds:{{ results.wounds.length }} {{ results.wounds }}</h3>
+                <!-- <h3 id="total-wounds">Final Wounds: {{ results.totalWounds }}</h3> -->
             </div>
     
             <div id="save-ward">
-                <h3 id="saves">Saves: {{ results.saves }}</h3>   
-                <h3 id="warded">Warded: {{ results.warded }}</h3>
+                <h3 id="saves">Saves:{{ results.saves.length }} {{ results.saves }}</h3>   
+                <h3 id="warded">Warded:{{ results.warded.length }} {{ results.warded }}</h3>
             </div>
             <div id="damage-done">
                 <h3 id="damage-inflicted">Damage: {{ results.damage }}</h3>
@@ -90,6 +90,7 @@
 
 <script>
 export default {
+    name: 'DiceRoller',
     data () {
         return {
             attacks: 0,
@@ -105,7 +106,14 @@ export default {
             maxValue: 6,
             hasWard: false,
             hasRerolls: false,
-            results: null,  // To store the calculation results
+            results: {
+                totalHits: [],
+                 criticals: [],
+                wounds: [],
+                saves: [],
+                 damage: 0,
+                warded: []
+            },  // To store the calculation results
             crits: [
                 { name: "None", id: false },
                 { name: "Auto Wound", id: false },
@@ -158,81 +166,104 @@ export default {
         }
     },
     methods: {
+        rollDice(min = 1, max = 6) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+    },
         calculateDamage() {
     if (!this.validateInputs()){
         return;
     }
-    if (this.hitrate > this.critrate){
+    if (this.hitrate > this.critrate && this.critEffects !== "Mortals"){
         this.critrate = this.hitrate;
     }
 
-    let totalHits = this.attacks * ((7 - this.hitrate) / 6);
-    let criticals = this.attacks * ((7 - this.critrate) / 6);
-    let totalWounds = 0;
-    let wounds = 0;
+    
+    
+    
+    let wounds = [];
     let mortalDamage = 0;
-    let saves = 0;
-    let warded = 0;
-    let finalHits = totalHits;
+    let saves = [];
+    let warded = [];
     let dmg = 0;
-
+    let failedSaves = [];
+    let hits = [];
+    let crits = [];
+    let totalAttacks = Array.from( {length : this.attacks}, ()=> this.rollDice());
     
+    totalAttacks.forEach((attack)=>{
+        if (attack === 1 && this.hasRerolls){
+            attack = this.rollDice();
+        }
+       if (attack >= this.hitrate && attack < this.critrate){
+        hits.push(attack);
+       }
+       if (attack >= this.critrate){
+        crits.push(attack);
+       }
+    });
+
+    if (this.critEffects === "Extra Hits"){
+        for (let i = 0; i < crits.length; i++){
+            hits.push(crits[i]);
+            hits.push(0);
+        }
+    }
+    if (this.critEffects === "None"){
+        for (let i = 0 ; i< crits.length; i++){
+            hits.push(crits[i]);
+        }
+    }
+    wounds = Array.from({length : hits.length}, ()=> this.rollDice());
     
-    if (this.hasRerolls) {
-        let rerolledOnes = this.attacks * (1 / 6); // 1/6th of attacks are 1's
-        let rerolledHits = rerolledOnes * ((7 - this.hitrate) / 6); // Rerolled hits
-        let rerolledCrits = rerolledOnes * ((7 - this.critrate) / 6); // Rerolled crits
-
-        // Remove rerolled crits from rerolled hits so we don't double-count them
-        rerolledHits -= rerolledCrits;
-
-        // Add rerolled hits and crits to totals
-        criticals += rerolledCrits;
-        finalHits += rerolledHits; // Add the rerolled hits to the final hits
+    for (let i = wounds.length -1; i >= 0; i--){
+        // const roll = this.rollDice();
+            if (wounds[i] < this.woundRate){
+                wounds.splice(i, 1);
+            }
     }
 
-    // Apply crit effects
-    if (this.critEffects === "Auto Wound") {
-        finalHits -= criticals; // Remove criticals from regular hits
-        totalWounds += criticals; // Criticals auto wound
-    } else if (this.critEffects === "Mortals") {
-        finalHits -= criticals; // Remove criticals from regular hits
-        mortalDamage += criticals; // Criticals deal mortal damage
-    } else if (this.critEffects === "Extra Hits") {
-        finalHits += criticals; // Criticals give extra hits
+    if (this.critEffects === "Auto Wound"){
+        for(let i = 0; i < crits.length; i++){
+            wounds.push(crits[i]);
+        }
     }
-           
-            
-            wounds = finalHits * ((7 - this.woundRate) / 6 );
 
-            totalWounds += wounds;
+    saves = Array.from({length : wounds.length}, ()=>this.rollDice());
 
-            saves = Math.max(0, totalWounds * ((7 - (this.saveRate + this.rend)) / 6 ));
+    for (let i = saves.length -1; i >= 0; i--){
+        // const roll = this.rollDice();
+        if (saves[i] < (this.saveRate + this.rend)){
+            failedSaves.push(saves[i])
+            saves.splice(i,1);
+        }
+    }
+    if (this.critEffects === "Mortals"){
+        mortalDamage = crits.length * this.damage;
+    }
+    const totalDamage = (failedSaves.length * this.damage) + mortalDamage;
+    while (failedSaves.length < totalDamage){
+        failedSaves.push(0);
+    }
 
-            dmg = this.damage * (totalWounds - saves);
+    for(let i = failedSaves.length -1 ; i >= 0; i--){
+        const roll = this.rollDice();
+        if (roll >= this.wardRate){
+           warded.push(roll);
+        }else{
+            dmg++;
+        }
+    }
 
-            // warded = dmg * ((7 - this.wardRate) / 6 );
-            if (this.wardRate < 7) {
-            warded = Math.min(dmg, dmg * ((7 - this.wardRate) / 6));
-            dmg = Math.max(0, dmg - warded);
-            }
-
-            if (mortalDamage > 0) {
-            mortalDamage*= this.damage;
-            warded = Math.min(mortalDamage, mortalDamage * ((7 - this.wardRate) / 6));
-            dmg += mortalDamage - warded;
-            }
-           
+    
+      
             
             this.results = {
-                totalHits:(totalHits),
-                criticals: (criticals),
-                finalHits: (finalHits),
-                wounds: (wounds),
-                totalWounds: (totalWounds),
-                saves: (saves),
+                totalHits:([...hits]),
+                criticals: ([...crits]),
+                wounds: ([...wounds]),
+                saves: [...saves],
                 damage: (dmg),
-                warded:(warded)
+                warded:[...warded]
             };
         },
         validateInputs() {

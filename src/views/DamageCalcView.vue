@@ -3,6 +3,7 @@
   <div class="home">
     <img alt="AoS Logo" src="../assets/AoSlogo.jpg">
   </div>
+  <nav-bar id="nav"/>
     <calculator id="calc"/>
     <div id="l-aside">
       <img class="pic" src="../assets/AoSGenHandbookOrder_Feature1nd.jpg" alt="order">
@@ -18,27 +19,33 @@
 
 <script>
 // @ is an alias to /src
-import calculator from '@/components/home.vue'
+import calculator from '@/components/DamageCalc.vue'
+import NavBar from '@/components/NavBar.vue';
 
 export default {
-  name: 'HomeView',
+  name: 'DamageCalc',
   components: {
-    calculator
+    calculator,
+    NavBar
   }
 }
 </script>
 
-<style>
+<style scoped>
 #container {
   display: grid;
-  grid-template-columns: 1fr; /* Single column layout by default */
+  grid-template-columns: 1fr; 
   grid-template-areas:
     "home"
+    "nav"
     "l-aside"
     "calc"
     "r-aside"
     "footer";
-  height: auto; /* Set the height to 100% of the viewport height */
+  height: auto; 
+}
+#nav{
+  grid-area: nav;
 }
 
 .home {
@@ -50,11 +57,11 @@ export default {
   border: solid;
   border-color: black;
   border-width: 3px;
-  width: 100%; /* Ensure images fill their container */
-  height: auto; /* Maintain aspect ratio */
+  width: 100%; 
+  height: auto; 
 }
 footer {
-    position: relative; /* Remove absolute positioning to avoid overlap */
+    position: relative; 
     grid-area: footer;
   }
   
@@ -62,8 +69,8 @@ footer {
 /* Media query for mobile devices */
 @media (max-width: 767px) {
   .pic {
-    width: 27%; /* Shrink images to 25% of their original size */
-    margin: 0 auto; /* Center images */
+    width: 27%; 
+    margin: 0 auto; 
     margin-left: 3vw;
   }
 }
@@ -73,8 +80,7 @@ footer {
   padding: 20px;
 }
 
-#l-aside,
-#r-aside {
+#l-aside {
   grid-area: l-aside;
 }
 
@@ -86,9 +92,10 @@ footer {
 /* Media query for tablets and larger devices */
 @media (min-width: 768px) {
   #container {
-    grid-template-columns: 1fr 2fr 1fr; /* 3-column layout */
+    grid-template-columns: 1fr 2fr 1fr; 
     grid-template-areas:
       "home home home"
+      "nav nav nav"
       "l-aside calc r-aside"
       "l-aside calc r-aside"
       "footer footer footer";
@@ -96,22 +103,23 @@ footer {
 
   #l-aside,
   #r-aside {
-    grid-row: span 2; /* Ensure sidebars span two rows */
+    grid-row: span 2; 
   }
 }
 
 /* Media query for large screens */
 @media (min-width: 1200px) {
   #container {
-    grid-template-columns: 1fr 2fr 1fr; /* Adjust layout for large screens if necessary */
+    grid-template-columns: 1fr 2fr 1fr; 
     grid-template-areas:
       "home home home"
+      "l-aside nav r-aside"
       "l-aside calc r-aside"
       "l-aside calc r-aside"
       "footer footer footer";
   }
   footer {
-    position: absolute; /* Ensure footer sticks to the bottom */
+    position: absolute; 
     bottom: 0;
     left: 0;
     right: 0;
@@ -125,10 +133,9 @@ footer {
   padding: 10px;
   border-top: solid;
   border-color: black;
-  /* background-color: #ccc; */
-  width: 100%; /* Ensure the footer takes the full width */
-  height: 50px; /* Define a fixed height */
-  box-sizing: border-box; /* Ensure padding doesn't exceed the defined height */
+  width: 100%; 
+  height: 50px; 
+  box-sizing: border-box; 
 }
 
 </style>

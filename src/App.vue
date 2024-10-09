@@ -1,12 +1,25 @@
+
 <template>
-  <div >
+ 
+
   <router-view/>
-</div>
+
 <footer>This application is a fan-made tool for personal use, not intended for commercial or profit purposes. 
   All intellectual property, including game mechanics, names, and images, are the property of Games Workshop, and this application is not endorsed or affiliated with them in any way.</footer>
 </template>
 
-<style lang="scss">
+<script>
+
+
+export default{
+  name: 'App',
+
+};
+
+</script>
+
+
+<style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -33,7 +46,7 @@ html, body, #app {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Prevent scrolling */
+  overflow: hidden; /* prevents scrolling in full screen */
 }
 
 #app {
@@ -42,9 +55,9 @@ html, body, #app {
 }
 
 router-view {
-  padding-bottom: 50px; /* Adjust based on the footer height */
-  height: calc(100vh - 50px); /* Ensure the main content fills the available space */
-  overflow-y: auto; /* Allow content scrolling inside this section if necessary */
+  padding-bottom: 50px; 
+  height: calc(100vh - 50px); 
+  overflow-y: auto; 
 }
 
 footer {
@@ -54,23 +67,23 @@ footer {
   padding: 10px;
   text-align: center;
   box-sizing: border-box;
-  height: 50px; /* Set an appropriate height */
+  height: 50px; 
 }
 @media (max-width: 767px) {
   html, body, #app {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: auto; 
+  overflow: auto; /* enables scrolling in smaller windows */
 }
 footer {
-  position: absolute;
+  position: relative;
   bottom: 0;
   width: 100%;
   padding: 10px;
   text-align: center;
   box-sizing: border-box;
-  height: 50px; /* Set an appropriate height */
+  height: 50px; 
 
   
 }
